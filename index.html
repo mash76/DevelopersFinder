@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Developer'sFinder</title>
+
+    <link href="./style.css" rel="stylesheet" type="text/css" />
+    <style>
+    body { font-family: sans-serif;
+           color:#444444;}
+
+    .link { color:#444444;  }
+    .link:hover { color:#666666; }
+
+    .tFile { color:#444444; }
+    .tFile:hover { color:gray; }
+
+    .tDir { color:DodgerBlue;}
+    .tDir:hover { color:DarkCyan;}
+
+    .tLink { fonct-color:pink;}
+    .crimson {color:crimson;}
+
+    </style>
+  </head>
+  <body>
+
+    <div >
+        <a onClick="goDir(process.env.HOME)" id="username" class="s120 bold" href="javascript:void(0)" >home</a>
+            <a onClick="goDir(process.env.HOME +'/Desktop')" href="javascript:void(0)" >desktop</a>
+            <a onClick="goDir(process.env.HOME +'/Documents')" href="javascript:void(0)" >doc</a>
+            <a onClick="goDir(process.env.HOME +'/Downloads')" href="javascript:void(0)" >download</a>
+            <a onClick="goDir(process.env.HOME +'/.Trash')" href="javascript:void(0)" >trash</a>
+
+        <a onClick="goDir('/Applications')" class="s120 bold" href="javascript:void(0)" >Applications</a>
+        <a onClick="goDir('/Volumes')" class="s120 bold" href="javascript:void(0)" >Volumes</a>
+        <a onClick="goDir('/etc')" class="s120 bold" href="javascript:void(0)" >etc</a>
+        <a onClick="goDir('/var')" class="s120 bold" href="javascript:void(0)" >var</a>
+
+        <a onClick="$('#shortcut').slideToggle(10)" href="javascript:void(0)"><span class="crimson">Shortcut</span></a>
+
+        <a onClick="osRunOut('rm ' + _G.save_path + '/*','debug','replace'); " href="javascript:void(0)"><span class="crimson">DelCache</span></a>
+
+        <div id="shortcut" style="display:none; margin:10px;" >
+          <!--Com H : go home directory <br/>  com h は appli をhide -->
+          Com UP : go upper directory <br/>
+          Com N : create new file or directory <br/>
+          Com B : toggle Bookmark <br/>
+          Com ← : back history 1 <br/>
+          Com ↑ : upper folder <br/>
+        </div>
+
+        <div id="bookmark" class="hide"></span>
+            <input id="filter_bookmark" type="text" class="" size=15 placeholder="filter bookmark">
+            
+            <span id="bookmark_list" path=""></span>
+            <span id="history_list" path=""></span>
+
+
+        </div>
+
+
+    </div>
+
+    <div id="mainwin" class="hide" style="border-bottom:solid 1px silver">
+        <span id="current" class="dodgerblue bold s150" ></span>
+        <a onClick="setBookmark(_G.current_path)" href="javascript:void(0)">bm</a>
+        <a onClick="openFinder(_G.current_path)" href="javascript:void(0)">finder</a>
+        <a onClick="setDirSize(_G.current_path)" href="javascript:void(0)">size</a><span id="dir_size" class="bold s150 gray"></span>
+        <span id="current_action" class="crimson">
+          <a onClick="toggleNew('toggle')" href="javascript:void(0)">new</a>
+        </span>
+
+        <span  class="crimson">
+          <a onClick="$('#command').slideToggle(10); $('#command_str').focus()" href="javascript:void(0)">command</a>
+        </span>
+
+
+
+        <br/>
+        <div id="new_action"  style="display:none;">
+            <a id="new_file" onClick="makeFile('aaaa.txt' )" href="javascript:void(0);" class="s150">file </a>
+            <a id="new_dir" onClick="makeDir( 'dir1' )" href="javascript:void(0);"  class="s150">folder</a>
+        </div>
+
+        <div id="findgrep" class="hide">
+            <input id="filter" type="text" class="" size=15 placeholder="filter">
+            <input id="find_depth" type="text" value="1" size=3 placeholder="depth">
+            <input id="grep_filter" type="text" class="" size=15 placeholder="grep">
+        </div>
+
+        <div id="command" class="hide">
+            <input id="command_str" type="text" class="" size="60" placeholder="command_str">
+            <div id="command_out" ></div>
+        </div>
+
+        <span id="filter_shell" ></span>
+        <br/>
+        file<span id="file_count"></span>
+        dir<span id="dir_count"></span>
+
+        <table style="margin-top:10px;"><tr>
+
+            <td id="file_list" path="" valign=top nowrap >
+            </td>
+            <td path=""  valign=top align=left class="code detail" >
+
+                <div id="file_view" >
+                    <span id="file_name" class="s120 bold underline"></span>
+                    <span onClick="osRun('open -t ' + $('#file_name').text())" class="btn">edit</span>
+                    <div id="file_contents"></div>
+                </div>
+
+            </td>
+            <td></td>    
+            <td></td>    
+            <td></td>    
+
+        </tr></table>
+
+    </div> <!-- mainwin -->
+
+    d1<div id="debug">debug</div>
+    d2<div id="debug2">debug2</div>
+
+  </body>
+  <script>
+    // You can also require other files to run in this process
+    require('./js/renderer.js')
+    require('./js/functions.js') // _G はここで定義
+    require('./js/bookmark.js') 
+    require('./js/finder.js')
+
+    require('./js/init.js') 
+
+  </script>
+</html>
