@@ -182,7 +182,7 @@ clickBookmark = function(_path){
   goDir( filepath )
   console.log('_path',_path)
 
-  if (!stat.isDirectory()) showFileContents( _path )
+  if (!stat.isDirectory()) showFileContents( _path ,1)
   else clearFileContents()
 
 }

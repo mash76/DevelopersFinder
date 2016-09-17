@@ -6,20 +6,6 @@ path = require('path')
 
 window.jQuery = window.$ = require('./jquery-3.1.0.js')
 
-_G = []
-_G.commandlog = []
-
-_G.save_path = process.cwd() + '/userdata'
-execOption = { encoding: 'utf8',
-                  timeout: 0,
-                  maxBuffer: 2000*1024,  //200*1024
-                  killSignal: 'SIGTERM',
-                  cwd: '',
-                  env: null }
-
-repo_btn_prev_push = "" //リポジトリ以下のBUTTONで直前push したもの
-repo_prev_push = ""
-top_filtered_repo = ""
 
 s60= function(str){ return '<span style="font-size:60%;">'+str+'</span>'}
 s80= function(str){ return '<span style="font-size:80%;">'+str+'</span>'}

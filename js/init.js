@@ -1,3 +1,29 @@
+_G = []
+_G.commandlog = []
+
+console.log('process.env.USER',process.env.USER)
+console.log('process.cwd()',process.cwd())
+console.log('process.resourcesPath',process.resourcesPath)
+
+_G.approot_path = process.cwd() 
+//アプリ版ならresourcePathを使う
+if (process.cwd() == "/"){
+    _G.approot_path = process.resourcesPath + '/app' 
+}
+_G.save_path = _G.approot_path + '/userdata'
+
+
+execOption = { encoding: 'utf8',
+                  timeout: 0,
+                  maxBuffer: 2000*1024,  //200*1024
+                  killSignal: 'SIGTERM',
+                  cwd: '',
+                  env: null }
+
+repo_btn_prev_push = "" //リポジトリ以下のBUTTONで直前push したもの
+repo_prev_push = ""
+top_filtered_repo = ""
+
 
 _G.username = ""
 _G.current_path = ""
@@ -6,9 +32,13 @@ _G.bookmark_ary = {}
 
 _G.username = process.env.USER
 
+console.log('process.env.USER',process.env.USER)
+console.log('process.cwd()',process.cwd())
+console.log('process.resourcesPath',process.resourcesPath)
+
 
 //保存ファイル読み込み
-if (!fs.existsSync('userdata')) fs.mkdir('userdata')
+if (!fs.existsSync(_G.approot_path +'/userdata')) fs.mkdir(_G.approot_path +'/userdata')
 
 _G.bookmark_ary = loadJson(_G.save_path　+ '/bookmark.json')
 if (!_G.bookmark_ary) _G.bookmark_ary = {}
@@ -18,7 +48,7 @@ _G.history_ary = loadJson(_G.save_path + '/history.json')
 console.log('history_ary', _G.history_ary)
 if (!_G.history_ary) _G.history_ary = {}
 toggleBookmarkList('down','')
-toggleFindgrep('up')
+//toggleFindgrep('up')
 
 
 //初期処理
@@ -36,7 +66,6 @@ osRunCb("find ~ -type f -maxdepth 6 | egrep 'AndroidManifest.xml$' ",
   }
 )
 
-
 osRunCb("find ~ -type f -maxdepth 6 | egrep 'xcodeproj$' ",
   function( ret_ary ){
       for (var ind in ret_ary){
@@ -48,26 +77,32 @@ osRunCb("find ~ -type f -maxdepth 6 | egrep 'xcodeproj$' ",
   }
 )
 
-
-
-
-$("#filter").keyup((e) =>{ showFilelist(_G.current_path , $('#filter').val()) })
+$("#filter").keyup((e) =>{ 
+    clearFileContents()
+    showFilelist(_G.current_path , $('#filter').val())
+  })
 
 
 //ファイルの中身表示 mouseOver
 $(document).on('mouseover','.tFile', function(e) {
-  console.log('mouseOver ' , e.target)
+  console.log('mouseOver tFile' , e.target)
 
   var fname = $(e.target).attr('bmkey')
-  showFileContents(fname)
+
+  showFileContents(fname,1)
 })
 
+//dir ならdir名とブックマーク一覧を表示
 $(document).on('mouseover','.tDir', function(e) {
-  console.log('mouseOver ' , e.target)
-  $('#file_name').html( sBlue($(e.target).text()) )
-  osRunOut('ls ' + $(e.target).text() , 'file_contents','replace' )
-})
+  console.log('mouseOver tDir ' , e.target)
 
+  $('#' + $(e.target).attr('child_name_id')).html( sBlue($(e.target).text()) )
+
+  osRunOut("ls '" + $(e.target).text() + "'" , $(e.target).attr('child_list_id'),'replace' )
+
+  // dir なら青、 dirなら次のpaneにファイル一覧を表示  ファイルなら次のpaneに中身を表示
+
+})
 
 $('#command_str').on('keyup',function(e){
   if (e.which == 13){
@@ -75,13 +110,14 @@ $('#command_str').on('keyup',function(e){
   }
 })
 
-
 //ショートカット
 $(document).on('keydown', function(e) {
 
     console.log("key metakey shiftkey ctrlkey", e.which, e.metaKey, e.shiftKey, e.ctrlKey )
 
     if (e.which ==38 && !e.metaKey) {  //   up
+
+
 
     }
     if (e.which == 37 && !e.metaKey) {  //  left  小フォルダに移動
@@ -118,6 +154,7 @@ $(document).on('keydown', function(e) {
 		  toggleFindgrep('toggle')
 	  }
     if (e.which ==27) {  // esc いろいろ開いてるもの閉じる
+      console.log('esc');
       toggleBookmarkList('down','')
       toggleFindgrep('up')
       $('#mainwin').hide()

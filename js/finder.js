@@ -65,33 +65,41 @@ setCurrentPath = function(path){
     $("#filter").focus()
 }
 
-clearFileContents = function(){
-    //ファイル内容ペーン消す
-    $('#file_name').html('')
-    $('#file_contents').html('')
 
+clearFileContents = function(){
+    $('#file_name1').html('')
+    $('#file_contents1').html('')
 }
 
-showFileContents = function(fname){
+showFileContents = function(fname,outToId){
 
-    console.log('showFileContents fname',fname)
+    $('#debug3').html('showFileContents fname=' + fname )
+
     if (fname == undefined || fname =="") alert('showFileContents fname ' + fname)
 
     //ファイル内容ペーン消す
-    $('#file_name').html('')
-    $('#file_contents').html('')
+    $('#file_name' + outToId).html( fname )
 
-    $('#file_name').html( fname )
+  //dirなら
+
+
 
   //画像なら
   if (fname.match(/(.png|.jpeg|.jpg|.gif)$/)){
-    $('#file_contents').html('<img src="' + fname + '" />')
+    $('#file_contents' + outToId).html('<img src="' + fname + '" />')
     return 
   }
   //画像以外
-  osRunOut("cat '" + fname + "' | head -c 10000" , 'file_contents','replace' )
-
-
+  osRunCb("cat '" + fname + "' | head -c 10000" , 
+    function(ret_ary){
+        //binaryでなければテキストとして中身表示
+        if (ret_ary.join('').match(/[\x00-\x08]/)){
+            $('#file_contents' + outToId).html(s200(s200(sSilver('Binary'))))
+        }else{
+            $('#file_contents' + outToId).html('<pre class="code">' + ret_ary.join('\n') + '</pre>')
+        }
+    }
+  )
 }
 
 
@@ -101,36 +109,36 @@ goDir = function(path){
 
   if ( path == undefined) return;
   setCurrentPath(path)
+  getExtList(path)
   showFilelist(_G.current_path,'')
   $('#mainwin').show()
 }
 
 makeFile= function(filename){
     var cmd = "echo '' > " + _G.current_path + "/" + filename
-    osrun(cmd ,function(){
+    osRun(cmd ,function(){
       console.log(filename)
       goDir(_G.current_path)
     })
 }
 makeDir =function(dirname){
     var cmd = "mkdir " + _G.current_path + "/" + dirname
-    osrun(cmd ,function(){
+    osRun(cmd ,function(){
       console.log(dirname)
       goDir(_G.current_path)
     })
 }
 
 openFinder = function(path){
-  osrun("open '" + path + "'",null)
+  osRun("open '" + path + "'",null)
 }
 
 termOpen = function(path){
   console.log(path)
-  osrun("open -a /Applications/iTerm.app",null)
+  osRun("open -a /Applications/iTerm.app",null)
 }
 
 getExtList = function(dir){
-
 
   var shell = "ls -A '" + dir + "'"
   osRunCb(shell,
@@ -154,18 +162,19 @@ getExtList = function(dir){
 
         var ext_str = ""
         for (var ind2 in ext_ct){
-          ext_str += '<span onMouseOver=" showFilelist(_G.current_path,\'' + ind2 + '\') ">' + 
+          ext_str += '<span onMouseOut=" showFilelist(_G.current_path,$(\'#filter\').val())" ' +
+                     '  onClick=" $(this).toggleClass(\'bold\'); $(\'#filter\').val(\'' + ind2 + '\'); showFilelist(_G.current_path,$(\'#filter\').val())" '+
+                     '  onMouseOver="showFilelist(_G.current_path,\'' + ind2 + '\') ">' + 
                     ind2 + '</span>' + sRed(ext_ct[ind2]) + " "   
         }
         $('#file_count').html(node_ct.file + ' ' + ext_str) 
     })
-
 }
 
 showFilelist = function(dir,filter){
-  console.log(dir,filter)
+  console.log('showFilelist dir filter ' , dir,filter)
 
-  getExtList(dir)
+  //getExtList(dir)
 
   //シェル文字列組み立て
   var shell = "ls -A '" + dir + "'"
@@ -193,8 +202,6 @@ showFilelist = function(dir,filter){
           }
       }
 
-
-
       //表示方法切り替え 画像サムネイル　シンプル ls-s (detail)
       //listThumb(shell,filter,files_ret,node_ct,ext_ct)
       //listInner(shell,filter,files_ret,node_ct,ext_ct)
@@ -221,17 +228,22 @@ listSimple = function(shell,filter,files_ret,node_ct,ext_ct) {
       var stat = fs.statSync(files_ret[ind])
 
       var filename_disp = path.basename(files_ret[ind])
+
+      //省略なしでいけるなら赤色に
+      filename_disp = trimStr(filename_disp) 
       if (filter) filename_disp = filename_disp.replace(re1,sRed('$1'))
 
       if ( stat.isDirectory() ) {
-          filename_disp = 
-              '<span class="tDir" onClick="goDir(_G.current_path + \'' + '/' + path.basename(files_ret[ind]) + '\')">' + 
-              trimStr(filename_disp) + '</span> '
+          filename_tag = 
+              '<span class="tDir" child_name_id="file_name1" child_list_id="file_contents1"  onClick="goDir(_G.current_path + \'' + '/' + path.basename(files_ret[ind]) + '\')">' + 
+              filename_disp + '</span> '
       }                         
       if (stat.isFile()) {
-          filename_disp = '<span class="tFile" bmkey="' + files_ret[ind] + '" >' + trimStr(filename_disp) + '</span>'
+
+          filename_tag = '<span class="tFile" bmkey="' + files_ret[ind] + '" >' + filename_disp + '</span>'
+
       }
-      filelist_outstr += filename_disp + '<br/>'
+      filelist_outstr += filename_tag + '<br/>'
   }
 
   $('#filter_shell').html( sSilver(shell) + ' ' + sCrimson(files_ret.length))
@@ -240,11 +252,21 @@ listSimple = function(shell,filter,files_ret,node_ct,ext_ct) {
   //拡張子
   console.log('ext' , ext_ct)
 
-
-
   $('#dir_count').html(node_ct.dir)
   $('#file_list').html( filelist_outstr )
 }
+
+// file_view1 - 4
+// file_name1 - 4
+// file_contents1 - 4
+
+//個ウィンドウ用のファイル一覧
+fileListChild = function(){
+
+
+}
+
+
 
 
 listThumb = function(shell,filter,files_ret,node_ct,ext_ct) {
@@ -299,13 +321,9 @@ listInner = function(shell,filter,files_ret,node_ct,ext_ct) {
       }
   }
 
-
   $('#filter_shell').html()
-
   $('#filter_shell').html( sSilver(shell) + ' ' + sCrimson(files_ret.length))
-
   $('#dir_count').html(node_ct.dir)
-
   $('#file_list').html( filelist_outstr )
 }
 

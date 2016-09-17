@@ -24,7 +24,7 @@
     </style>
   </head>
   <body>
-
+    <div id="debug3" class="s80" ></div>
     <div >
         <a onClick="goDir(process.env.HOME)" id="username" class="s120 bold" href="javascript:void(0)" >home</a>
             <a onClick="goDir(process.env.HOME +'/Desktop')" href="javascript:void(0)" >desktop</a>
@@ -83,7 +83,7 @@
             <a id="new_dir" onClick="makeDir( 'dir1' )" href="javascript:void(0);"  class="s150">folder</a>
         </div>
 
-        <div id="findgrep" class="hide">
+        <div id="findgrep" class="">
             <input id="filter" type="text" class="" size=15 placeholder="filter">
             <input id="find_depth" type="text" value="1" size=3 placeholder="depth">
             <input id="grep_filter" type="text" class="" size=15 placeholder="grep">
@@ -94,10 +94,9 @@
             <div id="command_out" ></div>
         </div>
 
-        <span id="filter_shell" ></span>
-        <br/>
         file<span id="file_count"></span>
         dir<span id="dir_count"></span>
+        <span id="filter_shell" ></span>
 
         <table style="margin-top:10px;"><tr>
 
@@ -105,16 +104,33 @@
             </td>
             <td path=""  valign=top align=left class="code detail" >
 
-                <div id="file_view" >
-                    <span id="file_name" class="s120 bold underline"></span>
-                    <span onClick="osRun('open -t ' + $('#file_name').text())" class="btn">edit</span>
-                    <div id="file_contents"></div>
+                <div id="file_view1" >
+                    <span id="file_name1" class="s120 bold underline"></span>
+                    <span onClick="osRun('open -t ' + $('#file_name1').text())" class="btn">edit</span>
+                    <div id="file_contents1"></div>
                 </div>
-
             </td>
-            <td></td>    
-            <td></td>    
-            <td></td>    
+            <td>
+                <div id="file_view2" >
+                    <span id="file_name2" class="s120 bold underline"></span>
+                    <span onClick="osRun('open -t ' + $('#file_name2').text())" class="btn">edit</span>
+                    <div id="file_contents2"></div>
+                </div>
+            </td>    
+            <td>
+                <div id="file_view3" >
+                    <span id="file_name3" class="s120 bold underline"></span>
+                    <span onClick="osRun('open -t ' + $('#file_name3').text())" class="btn">edit</span>
+                    <div id="file_contents3"></div>
+                </div>
+            </td>    
+            <td>
+                <div id="file_view4" >
+                    <span id="file_name4" class="s120 bold underline"></span>
+                    <span onClick="osRun('open -t ' + $('#file_name4').text())" class="btn">edit</span>
+                    <div id="file_contents4"></div>
+                </div>
+            </td>    
 
         </tr></table>
 
