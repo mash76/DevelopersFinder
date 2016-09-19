@@ -1,5 +1,4 @@
 
-
 //ブックマークを追加して、ファイルに保存
 setBookmark = function(fullpath,name){
   console.log('setBookmark ' + fullpath)
@@ -69,8 +68,9 @@ updateBookmarkList = function(filter){
         path_disp = path_disp.replace(re1,sRed('$1'))
         name_disp = name_disp.replace(re1,sRed('$1'))
     }
+    // tFile か tdirのclassがつく
     out.push(
-      { "name": '<span class="bm_go ' + classname +'" bmlistnum="' + bm_list_num + '" bmkey="' + ind + '">' +
+      { "name": '<span class="bm_go ' + classname +'" fullpath="' + ind + '" bmlistnum="' + bm_list_num + '" bmkey="' + ind + '">' +
         name_disp + '</span>',
         "path": sSilver(s80(path_disp)),
         "del": '<span class="bm_del btn" bmkey="'+ ind +'">del</span> ',
@@ -117,8 +117,6 @@ updateHistoryList = function(filter){
   }
   $('#history_list').html( 'history ' + out.length + ary2html(out,'') )  
 }
-
-
 
 
 // 最初に人がよく使うフォルダやファイルを自動でbookmarkしておく

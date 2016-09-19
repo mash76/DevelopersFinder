@@ -75,3 +75,22 @@ app.on('activate', function () {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+
+
+// ブラウザプロセスとの通信処理
+
+const {ipcMain} = require('electron')
+// devtools トグル非同期
+ipcMain.on('ipcDevTool', function(event, arg) {
+    mainWindow.webContents.toggleDevTools()
+});
+ipcMain.on('ipcFullScreen', function(event, arg) {
+    if (mainWindow.isFullScreen()){
+        mainWindow.setFullScreen(false)
+    }else{
+        mainWindow.setFullScreen(true)
+    }
+});
+
+
+

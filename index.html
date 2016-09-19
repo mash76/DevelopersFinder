@@ -68,14 +68,12 @@
         <a onClick="openFinder(_G.current_path)" href="javascript:void(0)">finder</a>
         <a onClick="setDirSize(_G.current_path)" href="javascript:void(0)">size</a><span id="dir_size" class="bold s150 gray"></span>
         <span id="current_action" class="crimson">
-          <a onClick="toggleNew('toggle')" href="javascript:void(0)">new</a>
+            <a onClick="toggleNew('toggle')" href="javascript:void(0)">new</a>
         </span>
 
         <span  class="crimson">
-          <a onClick="$('#command').slideToggle(10); $('#command_str').focus()" href="javascript:void(0)">command</a>
+            <a onClick="$('#command').slideToggle(10); $('#command_str').focus()" href="javascript:void(0)">command</a>
         </span>
-
-
 
         <br/>
         <div id="new_action"  style="display:none;">
@@ -100,37 +98,48 @@
 
         <table style="margin-top:10px;"><tr>
 
-            <td id="file_list" path="" valign=top nowrap >
-            </td>
-            <td path=""  valign=top align=left class="code detail" >
-
+            <td valign=top align=left nowrap class="code detail" >
                 <div id="file_view1" >
                     <span id="file_name1" class="s120 bold underline"></span>
                     <span onClick="osRun('open -t ' + $('#file_name1').text())" class="btn">edit</span>
                     <div id="file_contents1"></div>
                 </div>
             </td>
-            <td>
+            <td valign=top align=left nowrap class="code detail" >
                 <div id="file_view2" >
                     <span id="file_name2" class="s120 bold underline"></span>
                     <span onClick="osRun('open -t ' + $('#file_name2').text())" class="btn">edit</span>
                     <div id="file_contents2"></div>
                 </div>
-            </td>    
-            <td>
+            </td >    
+            <td valign=top align=left nowrap class="code detail">
                 <div id="file_view3" >
                     <span id="file_name3" class="s120 bold underline"></span>
                     <span onClick="osRun('open -t ' + $('#file_name3').text())" class="btn">edit</span>
                     <div id="file_contents3"></div>
                 </div>
             </td>    
-            <td>
+            <td valign=top align=left nowrap class="code detail">
                 <div id="file_view4" >
                     <span id="file_name4" class="s120 bold underline"></span>
                     <span onClick="osRun('open -t ' + $('#file_name4').text())" class="btn">edit</span>
                     <div id="file_contents4"></div>
                 </div>
             </td>    
+            <td valign=top align=left nowrap class="code detail">
+                <div id="file_view5" >
+                    <span id="file_name5" class="s120 bold underline"></span>
+                    <span onClick="osRun('open -t ' + $('#file_name5').text())" class="btn">edit</span>
+                    <div id="file_contents5"></div>
+                </div>
+            </td>   
+            <td valign=top align=left nowrap class="code detail">
+                <div id="file_view6" >
+                    <span id="file_name6" class="s120 bold underline"></span>
+                    <span onClick="osRun('open -t ' + $('#file_name6').text())" class="btn">edit</span>
+                    <div id="file_contents6"></div>
+                </div>
+            </td>   
 
         </tr></table>
 

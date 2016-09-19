@@ -1,9 +1,12 @@
 
+
 setDirSize = function(){
     osRunCb('du -d0 -h',function(ret_ary){
         $('#dir_size').html(ret_ary.join(''))
+
     })
 }
+
 
 toggleFindgrep = function(updown){
 
@@ -22,7 +25,6 @@ toggleFindgrep = function(updown){
   $('#findgrep').slideDown(10)
   $('#filter').focus()
 }
-
 
 
 toggleNew = function(updown ){
@@ -66,43 +68,6 @@ setCurrentPath = function(path){
 }
 
 
-clearFileContents = function(){
-    $('#file_name1').html('')
-    $('#file_contents1').html('')
-}
-
-showFileContents = function(fname,outToId){
-
-    $('#debug3').html('showFileContents fname=' + fname )
-
-    if (fname == undefined || fname =="") alert('showFileContents fname ' + fname)
-
-    //ファイル内容ペーン消す
-    $('#file_name' + outToId).html( fname )
-
-  //dirなら
-
-
-
-  //画像なら
-  if (fname.match(/(.png|.jpeg|.jpg|.gif)$/)){
-    $('#file_contents' + outToId).html('<img src="' + fname + '" />')
-    return 
-  }
-  //画像以外
-  osRunCb("cat '" + fname + "' | head -c 10000" , 
-    function(ret_ary){
-        //binaryでなければテキストとして中身表示
-        if (ret_ary.join('').match(/[\x00-\x08]/)){
-            $('#file_contents' + outToId).html(s200(s200(sSilver('Binary'))))
-        }else{
-            $('#file_contents' + outToId).html('<pre class="code">' + ret_ary.join('\n') + '</pre>')
-        }
-    }
-  )
-}
-
-
 goDir = function(path){
 
   console.log('goDir ' + path)
@@ -110,7 +75,7 @@ goDir = function(path){
   if ( path == undefined) return;
   setCurrentPath(path)
   getExtList(path)
-  showFilelist(_G.current_path,'')
+  showFilelist(_G.current_path,'','file_contents1')
   $('#mainwin').show()
 }
 
@@ -162,17 +127,63 @@ getExtList = function(dir){
 
         var ext_str = ""
         for (var ind2 in ext_ct){
-          ext_str += '<span onMouseOut=" showFilelist(_G.current_path,$(\'#filter\').val())" ' +
-                     '  onClick=" $(this).toggleClass(\'bold\'); $(\'#filter\').val(\'' + ind2 + '\'); showFilelist(_G.current_path,$(\'#filter\').val())" '+
-                     '  onMouseOver="showFilelist(_G.current_path,\'' + ind2 + '\') ">' + 
+          ext_str += '<span onMouseOut=" showFilelist(_G.current_path,$(\'#filter\').val(),\'fle_contents1\')" ' +
+                     '  onClick=" $(this).toggleClass(\'bold\'); $(\'#filter\').val(\'' + ind2 + '\'); showFilelist(_G.current_path,$(\'#filter\').val(),\'fle_contents1\')" '+
+                     '  onMouseOver="showFilelist(_G.current_path,\'' + ind2 + '\',\'fle_contents1\') ">' + 
                     ind2 + '</span>' + sRed(ext_ct[ind2]) + " "   
         }
-        $('#file_count').html(node_ct.file + ' ' + ext_str) 
+        $('#file_count').html(node_ct.file + ' ' + ext_str)
+
     })
 }
 
-showFilelist = function(dir,filter){
-  console.log('showFilelist dir filter ' , dir,filter)
+
+
+clearFileContents = function(){
+    $('#file_name1').html('')
+    $('#file_contents1').html('')
+}
+
+showFileContents = function(fname,outToId){
+
+    //$('#debug3').html('showFileContents fname,outToId ' + fname + ' ' + outToId)
+
+    if (fname == undefined || fname =="") alert('showFileContents fname ' + fname)
+
+  // var to_id = parseInt(outToId.substr(-1))  // file_contents2 から 2 へ変換
+  // for (var i = to_id + 1; i<=6; i++ ){
+  //     $('#file_name' + i).html('')
+  //     $('#file_contents' + i).html('')
+  // }
+
+    //ファイル内容ペーン消す
+    $('#file_name' + outToId).html( fname )
+
+  //dirなら
+
+
+
+  //画像なら
+  if (fname.match(/(.png|.jpeg|.jpg|.gif)$/)){
+    $('#' + outToId).html('<img src="' + fname + '" />')
+    return 
+  }
+  //画像以外
+  osRunCb("cat '" + fname + "' | head -c 10000" , 
+    function(ret_ary){
+        //binaryでなければテキストとして中身表示
+        if (ret_ary.join('').match(/[\x00-\x08]/)){
+            $('#' + outToId).html(s200(s200(sSilver('Binary'))))
+        }else{
+            $('#' + outToId).html('<pre class="code">' + ret_ary.join('\n') + '</pre>')
+        }
+    }
+  )
+}
+
+
+showFilelist = function(dir,filter,outToId){
+  console.log('showFilelist dir filter outToId' , dir,filter,outToId)
 
   //getExtList(dir)
 
@@ -203,25 +214,33 @@ showFilelist = function(dir,filter){
       }
 
       //表示方法切り替え 画像サムネイル　シンプル ls-s (detail)
-      //listThumb(shell,filter,files_ret,node_ct,ext_ct)
-      //listInner(shell,filter,files_ret,node_ct,ext_ct)
-      //listDetail(shell,filter,files_ret,node_ct,ext_ct)
-      listSimple(shell,filter,files_ret,node_ct,ext_ct)
+      //listThumb(shell,filter,files_ret)
+      //listInner(shell,filter,files_ret)
+      //listDetail(shell,filter,files_ret)
+      listSimple(shell,filter,files_ret,outToId)
     }
   )
 }
 
-listDetail = function(shell,filter,files_ret,node_ct,ext_ct) {}
+listDetail = function(shell,filter,files_ret) {}
 
 trimStr = function(str){
   if (str.length > 20) return str.slice(0,14) + ".." + path.extname(str)
   return str
 }
 
-//ファイル一覧をシンプルに表示
-listSimple = function(shell,filter,files_ret,node_ct,ext_ct) {
+//ファイル一覧をシンプルに表示  次のタグへのリンクも
+listSimple = function(shell,filter,files_ret,outToId) {
+
+  console.log('listSimple id=' + outToId )
 
   var re1 = new RegExp( '(' + filter + ')', 'gi')
+
+  var to_id = parseInt(outToId.substr(-1))  // file_contents2 から 2 へ変換
+  for (var i = to_id + 1; i<=6; i++ ){
+      $('#file_name' + i).html('')
+      $('#file_contents' + i).html('')
+  }
 
   var filelist_outstr =""
   for (var ind in files_ret){
@@ -235,25 +254,25 @@ listSimple = function(shell,filter,files_ret,node_ct,ext_ct) {
 
       if ( stat.isDirectory() ) {
           filename_tag = 
-              '<span class="tDir" child_name_id="file_name1" child_list_id="file_contents1"  onClick="goDir(_G.current_path + \'' + '/' + path.basename(files_ret[ind]) + '\')">' + 
+              '<span class="tDir" ' + 
+              ' fullpath="' + files_ret[ind] + '"  ' +               
+              ' child_name_id="file_name' + (to_id + 1) + '" ' +
+              ' child_list_id="file_contents' + (to_id + 1) + '"  ' + 
+              ' onClick="goDir(_G.current_path + \'' + '/' + path.basename(files_ret[ind]) + '\')">' + 
               filename_disp + '</span> '
       }                         
       if (stat.isFile()) {
-
-          filename_tag = '<span class="tFile" bmkey="' + files_ret[ind] + '" >' + filename_disp + '</span>'
-
+          filename_tag = '<span class="tFile" bmkey="' + files_ret[ind] + '" ' + 
+                        ' fullpath="' + files_ret[ind] + '"  ' + 
+                        ' child_name_id="file_name' + (to_id + 1) + '" ' +
+                        ' child_list_id="file_contents' + (to_id + 1) + '" >' + 
+                        filename_disp + '</span> '
       }
       filelist_outstr += filename_tag + '<br/>'
   }
 
   $('#filter_shell').html( sSilver(shell) + ' ' + sCrimson(files_ret.length))
-
-
-  //拡張子
-  console.log('ext' , ext_ct)
-
-  $('#dir_count').html(node_ct.dir)
-  $('#file_list').html( filelist_outstr )
+  $('#' + outToId).html( filelist_outstr )
 }
 
 // file_view1 - 4
