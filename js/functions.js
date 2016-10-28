@@ -13,16 +13,16 @@ s120= function(str){ return '<span style="font-size:120%;">'+str+'</span>'}
 s150= function(str){ return '<span style="font-size:150%;">'+str+'</span>'}
 s200= function(str){ return '<span style="font-size:200%;">'+str+'</span>'}
 
-sGrayRed= function(str){ return '<span style="color:#bb4444;">' + str + '</span>'}
+sGrayRed=  function(str){ return '<span style="color:#bb4444;">' + str + '</span>'}
 sGrayBlue= function(str){ return '<span style="color:#4444bb;">' + str + '</span>'}
-sRed=  function(str){ return '<span style="color:red;">' + str + '</span>'}
+sRed=   function(str){ return '<span style="color:red;">' + str + '</span>'}
 sBlue=  function(str){ return '<span style="color:blue;">' + str + '</span>'}
 sDodgerblue=  function(str){ return '<span style="color:blue;">' + str + '</span>'}
-sPink= function(str){ return '<span style="color:DeepPink;">' + str + '</span>'}
+sPink=  function(str){ return '<span style="color:DeepPink;">' + str + '</span>'}
 sGreen= function(str){ return '<span style="color:green;">' + str + '</span>'}
 
-sBlueRev= function(str){ return '<span style="color:white; background-color:blue;">' + str + '</span>'}
-sPinkRev= function(str){ return '<span style="color:white; background-color:DeepPink;">' + str + '</span>'}
+sBlueRev=  function(str){ return '<span style="color:white; background-color:blue;">' + str + '</span>'}
+sPinkRev=  function(str){ return '<span style="color:white; background-color:DeepPink;">' + str + '</span>'}
 sGreenRev= function(str){ return '<span style="color:white; background-color:green;">' + str + '</span>'}
 
 
@@ -39,26 +39,8 @@ url2link = function(line ){ return line.replace(/(http.*?) /, '<span onClick="os
 escapeHTML = function(html) { return $('<div>').text(html).html() }
 escapeRegExp = function(string) {  return string.replace(/([.*+?^=!:${}()|[\]\/\\])/g, "\\$1");}
 replaceTabSpc = function(str) { return str.replace(/ /ig,'&nbsp;').replace(/\t/ig,'&nbsp;&nbsp;&nbsp;&nbsp;')}
-matchRed = function(str,filter) { 
-  if (str == null ) return ""
-  var filter_ary = filter.trim().split(/\s+/)
-  var ret = ""
-  for (var ind5 in filter_ary ){
-      if (filter_ary[ind5]) str = str.toString().replace(new RegExp('(' + filter_ary[ind5].trim() + ')','ig'),sRed('$1') ) 
-  }
-  return str
-}
+matchRed = function(str,filter) { return str.replace(new RegExp('(' + filter.trim() + ')','ig'),sRed('$1') ) }
 
-recordsMatchRed= function(ary,filter){
-    console.log('recordsMatchRed')
-    for (var ind in ary){
-        var row = ary[ind]
-        for (var ind2 in row){
-            row[ind2] = matchRed( row[ind2], filter )
-        }
-    }
-    return ary
-}
 
 setSelect = function (self){
     $(self).parent().children().attr('class','silver'); 
@@ -121,7 +103,7 @@ osRunOneLine = function(command , out_html_id){
 }
 
 //独自のコールバックで処理したいとき
-osRunCb = function(command , cb , cb_param){
+osRunCb = function(command , cb){
   console.log(command)
   _G.commandlog.push(command)
 
@@ -134,25 +116,7 @@ osRunCb = function(command , cb , cb_param){
     ret_ary = []
     if (stdout != "") ret_ary = stdout.replace(/\n$/,'').split(/\n/) 
 
-    if (typeof cb == "function") ret_ary = cb(ret_ary,stderr,command,cb_param)
-  });
-}
-
-//paramも渡す版
-osRunCbParam = function(command , cb_param , cb){
-  console.log(command)
-  _G.commandlog.push(command)
-
-  exec(command,execOption, (error, stdout, stderr) => {
-
-    if (error) console.log('error',error)
-    if (stderr) console.log('stderr',stderr)
-
-    //配列化 最終行の改行取り除いて
-    ret_ary = []
-    if (stdout != "") ret_ary = stdout.replace(/\n$/,'').split(/\n/) 
-
-    if (typeof cb == "function") ret_ary = cb(ret_ary,cb_param,stderr,command)
+    if (typeof cb == "function") ret_ary = cb(ret_ary,stderr,command)
   });
 }
 
@@ -201,25 +165,13 @@ diffColor = function (ary){
 ary2html = function(jsonAry, strProperty){
 
   // jsonAry jsonを配列でリストにしたもの
-  // strProperty = "title bold"  タイトルつける、太字にする
-
-  // title : タイトル行つける
-
-  //以下は予定
-  // comma : 数値に3桁区切りのカンマ入れる
-  // number : 芳しい声が聞こえてこない 
-  // numberred : マイナスの数値を赤にする
+  // strProperty = "title bold" 
 
   if (!strProperty) strProperty = " "
 
   if (!jsonAry) return ""
 
-  var ret =""
-  if (strProperty.match(/rowcount/i)){
-    ret += jsonAry.length 
-  }
-
-  ret += "<table>\n"
+  var ret = "<table>\n"
   for (var ind in jsonAry){
 
       var row = jsonAry[ind]

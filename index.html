@@ -2,15 +2,12 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>ImageView</title>
+    <title>Developer'sFinder</title>
 
     <link href="./style.css" rel="stylesheet" type="text/css" />
     <style>
     body { font-family: sans-serif;
            color:#444444;}
-
-    td {font-size:70%;}
-
 
     .link { color:#444444;  }
     .link:hover { color:#666666; }
@@ -27,16 +24,18 @@
     </style>
   </head>
   <body>
-
+    <div id="debug3" class="s80" ></div>
     <div >
-        <a onClick="$('#sqlite').slideToggle(10)" class="s120 bold" href="javascript:void(0)" >sqlite</a>
-        <a onClick="setXYs();" class="s120 bold" href="javascript:void(0)" >setXY</a>
-        <a onClick="createThumbnails();" class="s120 bold" href="javascript:void(0)" >createthumb</a>
+        <a onClick="goDir(process.env.HOME)" id="username" class="s120 bold" href="javascript:void(0)" >home</a>
+            <a onClick="goDir(process.env.HOME +'/Desktop')" href="javascript:void(0)" >desktop</a>
+            <a onClick="goDir(process.env.HOME +'/Documents')" href="javascript:void(0)" >doc</a>
+            <a onClick="goDir(process.env.HOME +'/Downloads')" href="javascript:void(0)" >download</a>
+            <a onClick="goDir(process.env.HOME +'/.Trash')" href="javascript:void(0)" >trash</a>
 
-        <a onClick="filterSqlite('');" class="s120 bold" href="javascript:void(0)" >refreshSqlite</a>
-
-        <a onClick="osRun('open ' + _G.thumb_dir)" class="s120 bold" href="javascript:void(0)" >openThumbDir</a>
-
+        <a onClick="goDir('/Applications')" class="s120 bold" href="javascript:void(0)" >Applications</a>
+        <a onClick="goDir('/Volumes')" class="s120 bold" href="javascript:void(0)" >Volumes</a>
+        <a onClick="goDir('/etc')" class="s120 bold" href="javascript:void(0)" >etc</a>
+        <a onClick="goDir('/var')" class="s120 bold" href="javascript:void(0)" >var</a>
 
         <a onClick="$('#shortcut').slideToggle(10)" href="javascript:void(0)"><span class="crimson">Shortcut</span></a>
 
@@ -51,41 +50,113 @@
           Com ↑ : upper folder <br/>
         </div>
 
-    <br/>
-    <span id="image_root" class="s100" ></span>
-    <span id="total_ext"></span>
+        <div id="bookmark" class="hide"></span>
+            <input id="filter_bookmark" type="text" class="" size=15 placeholder="filter bookmark">
+            
+            <span id="bookmark_list" path=""></span>
+            <span id="history_list" path=""></span>
 
-    <input id="filter_bookmark" type="text" class="" size=15 placeholder="filter bookmark">
-    
-    <span class="btn" onMouseOver="$('img').attr('height','50').attr('width','50')">50</span> 
-    <span class="btn" onMouseOver="$('img').attr('height','80').attr('width','80')">80</span> 
-    <span class="btn" onMouseOver="$('img').attr('height','100').attr('width','100')">100</span> 
-    <span class="btn" onMouseOver="$('img').attr('height','200').attr('width','200')">200</span> 
 
-    <br/>
+        </div>
 
-    <div id="sqlite" class="">
-        SQLite debug<br/>
-        
-        <div id="sqlite_summary">summary</div>
-        <div id="sqlite1" ></div>
-        <div id="sqlite2" ></div>
-        <div id="sqlite3" ></div>
-    </div>
-  thumbnail
-    <div id="thumbnail_pane" ></div>
-
-    <div id="image_list" ></div>
 
     </div>
+
+    <div id="mainwin" class="hide" style="border-bottom:solid 1px silver">
+        <span id="current" class="dodgerblue bold s150" ></span>
+        <a onClick="setBookmark(_G.current_path)" href="javascript:void(0)">bm</a>
+        <a onClick="openFinder(_G.current_path)" href="javascript:void(0)">finder</a>
+        <a onClick="setDirSize(_G.current_path)" href="javascript:void(0)">size</a><span id="dir_size" class="bold s150 gray"></span>
+        <span id="current_action" class="crimson">
+            <a onClick="toggleNew('toggle')" href="javascript:void(0)">new</a>
+        </span>
+
+        <span  class="crimson">
+            <a onClick="$('#command').slideToggle(10); $('#command_str').focus()" href="javascript:void(0)">command</a>
+        </span>
+
+        <br/>
+        <div id="new_action"  style="display:none;">
+            <a id="new_file" onClick="makeFile('aaaa.txt' )" href="javascript:void(0);" class="s150">file </a>
+            <a id="new_dir" onClick="makeDir( 'dir1' )" href="javascript:void(0);"  class="s150">folder</a>
+        </div>
+
+        <div id="findgrep" class="">
+            <input id="filter" type="text" class="" size=15 placeholder="filter">
+            <input id="find_depth" type="text" value="1" size=3 placeholder="depth">
+            <input id="grep_filter" type="text" class="" size=15 placeholder="grep">
+        </div>
+
+        <div id="command" class="hide">
+            <input id="command_str" type="text" class="" size="60" placeholder="command_str">
+            <div id="command_out" ></div>
+        </div>
+
+        file<span id="file_count"></span>
+        dir<span id="dir_count"></span>
+        <span id="filter_shell" ></span>
+
+        <table style="margin-top:10px;"><tr>
+
+            <td valign=top align=left nowrap class="code detail" >
+                <div id="file_view1" >
+                    <span id="file_name1" class="s120 bold underline"></span>
+                    <span onClick="osRun('open -t ' + $('#file_name1').text())" class="btn">edit</span>
+                    <div id="file_contents1"></div>
+                </div>
+            </td>
+            <td valign=top align=left nowrap class="code detail" >
+                <div id="file_view2" >
+                    <span id="file_name2" class="s120 bold underline"></span>
+                    <span onClick="osRun('open -t ' + $('#file_name2').text())" class="btn">edit</span>
+                    <div id="file_contents2"></div>
+                </div>
+            </td >    
+            <td valign=top align=left nowrap class="code detail">
+                <div id="file_view3" >
+                    <span id="file_name3" class="s120 bold underline"></span>
+                    <span onClick="osRun('open -t ' + $('#file_name3').text())" class="btn">edit</span>
+                    <div id="file_contents3"></div>
+                </div>
+            </td>    
+            <td valign=top align=left nowrap class="code detail">
+                <div id="file_view4" >
+                    <span id="file_name4" class="s120 bold underline"></span>
+                    <span onClick="osRun('open -t ' + $('#file_name4').text())" class="btn">edit</span>
+                    <div id="file_contents4"></div>
+                </div>
+            </td>    
+            <td valign=top align=left nowrap class="code detail">
+                <div id="file_view5" >
+                    <span id="file_name5" class="s120 bold underline"></span>
+                    <span onClick="osRun('open -t ' + $('#file_name5').text())" class="btn">edit</span>
+                    <div id="file_contents5"></div>
+                </div>
+            </td>   
+            <td valign=top align=left nowrap class="code detail">
+                <div id="file_view6" >
+                    <span id="file_name6" class="s120 bold underline"></span>
+                    <span onClick="osRun('open -t ' + $('#file_name6').text())" class="btn">edit</span>
+                    <div id="file_contents6"></div>
+                </div>
+            </td>   
+
+        </tr></table>
+
+    </div> <!-- mainwin -->
+
+    d1<div id="debug">debug</div>
+    d2<div id="debug2">debug2</div>
+
   </body>
   <script>
     // You can also require other files to run in this process
     require('./js/renderer.js')
-    require('./js/functions.js') 
+    require('./js/functions.js') // _G はここで定義
+    require('./js/bookmark.js') 
     require('./js/finder.js')
 
-    require('./js/init.js') // _G はここで定義
+    require('./js/init.js') 
 
   </script>
 </html>
